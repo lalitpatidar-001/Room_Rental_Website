@@ -1,15 +1,39 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Container, Discount, Feature, Features, Heading, Hr, Left, ModelName, OptionBox, OriginalPrice, Price, PriceDiv, Rams, Address, Right, Storages, Wrapper, FeatureDiv, Map, FullAddress, Button, AddressValue, AddressRow, AddressHead, AddressHeading, ButtonWrapper, Button2 } from './style'
+import { Container, Discount, Feature, Features, Heading, Hr, Left, ModelName, OptionBox, OriginalPrice, Price, PriceDiv, Rams, Address, Right, Storages, Wrapper, FeatureDiv, Map, FullAddress, Button, AddressValue, AddressRow, AddressHead, AddressHeading, ButtonWrapper, Button2, ButtonCancel, LoadingButton } from './style'
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import CurrencyRupeeOutlinedIcon from '@mui/icons-material/CurrencyRupeeOutlined';
 import { Error } from './style';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { userContext } from '../../context/userContext';
-import {toast} from "react-hot-toast"
+import { toast } from "react-hot-toast"
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteWishlist, updateWishlist } from '../../redux/slices/wishlistSlice';
+import { deleteVisit, updateVisit } from '../../redux/slices/visitsSlice';
 
 function DetailCard({ room }) {
-  const {isLoggedIn, setIsLoggedIn} = useContext(userContext);
+  const { isLoggedIn, setIsLoggedIn } = useContext(userContext);
+  const { wishlists } = useSelector(state => state.wishlist);
+  const { roomVisits } = useSelector(state => state.visits);
+  const dispatch = useDispatch();
+  const [isInWishList, setIsInWishlist] = useState(wishlists.some(item => item._id === room?._id));
+  const [isInVisits, setIsInVisits] = useState(roomVisits.some(item => item._id === room?._id));
+  const [inviteLoading, setInviteLoading] =
+    useState(false)
+  const [wishlistLoading, setWishlistLoading] =
+    useState(false)
+
+
+
+  useEffect(() => {
+    setIsInWishlist(wishlists.some(item => item._id === room?._id))
+  }, [wishlists]);
+  useEffect(() => {
+    setIsInVisits(roomVisits.some(item => item._id === room?._id))
+  }, [roomVisits]);
+
+
+  console.log("in wish", isInWishList)
   console.log("room", room)
   if (!room) {
     return
@@ -33,39 +57,67 @@ function DetailCard({ room }) {
       floor = room.floorNumber + "th"
   }
 
-  const handleInquiryVisit = async() => {
-      try {
-        const response = await axios.put(`http://localhost:5000/api/room/book-room/${room._id}/${isLoggedIn._id}`);
-       if(response.status === 200){
-        toast.success("Room Added To Visits")
-       }
-        
-        //   setCartItemCount(response.data?.cartMobiles?.length)
-
-      } catch (error) {
-        console.log(error)
+  const handleInquiryVisit = async () => {
+    try {
+      setInviteLoading(true)
+      const response = await axios.put(`http://localhost:5000/api/room/book-room/${room._id}/${isLoggedIn._id}`);
+      console.log("visit dispavyh", response.data.data)
+      if (response.status === 200) {
+        toast.success("Room Added To Visits");
+        dispatch(updateVisit({ data: response.data.data }));
       }
-    
-}
-  const handleToggleToWhishlist = async() => {
-      try {
-        const response = await axios.put(`http://localhost:5000/api/user//update-wishlist/${room._id}/${isLoggedIn._id}`);
-       if(response.status === 200){
-        toast.success(response.data.message)
-       }
-        
-
-      } catch (error) {
-        console.log(error)
+      //   setCartItemCount(response.data?.cartMobiles?.length)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setInviteLoading(false)
+    }
+  }
+  const handleCancelVisit = async () => {
+    try {
+      setInviteLoading(true);
+      const response = await axios.put(`http://localhost:5000/api/room/cancel-room/${room._id}/${isLoggedIn._id}`);
+      console.log("visit dispavyh", response.data.data)
+      if (response.status === 200) {
+        toast.success("Canceled Room Visit");
+        dispatch(deleteVisit({ data: room._id }));
       }
-    
-}
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setInviteLoading(false);
+    }
+  }
+
+
+
+
+  const handleToggleToWhishlist = async () => {
+    try {
+      setWishlistLoading(true)
+      const response = await axios.put(`http://localhost:5000/api/user//update-wishlist/${room._id}/${isLoggedIn._id}`);
+      if (response.status === 200) {
+        toast.success(response.data.message);
+        if (isInWishList) {
+          dispatch(deleteWishlist({ data: room._id }));
+        } else {
+          dispatch(updateWishlist({ data: room }))
+        }
+
+      }
+
+
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setWishlistLoading(false);
+    }
+
+  }
 
   return (
     <Wrapper>
-
       <Container>
-
         <Left>
           <ModelName>{room.roomType} </ModelName>
           <Address>
@@ -130,11 +182,7 @@ function DetailCard({ room }) {
               {room.accessbility.petallowed ?
                 " Pets are allowed" : " no pet allowed"}
             </Feature>
-
-
-
           </Features>
-
         </Left>
 
         <Right>
@@ -164,8 +212,24 @@ function DetailCard({ room }) {
           </FullAddress>
 
           <ButtonWrapper>
-            <Button onClick={handleInquiryVisit}>Inform Visit</Button>
-            <Button2 onClick={handleToggleToWhishlist}>Add To Wishlist</Button2>
+            {inviteLoading ? <LoadingButton>Updating invite...</LoadingButton>
+              :
+              <>
+                {!isInVisits ? <Button onClick={handleInquiryVisit}>Inform Visit</Button>
+                  :
+                  <ButtonCancel onClick={handleCancelVisit}>Cancel Visit</ButtonCancel>}
+              </>
+            }
+            {/* toggle whishlist button */}
+            {wishlistLoading ? <LoadingButton>Updating wishlist...</LoadingButton>
+            :
+              <>
+                {!isInWishList ?
+                  <Button2 onClick={handleToggleToWhishlist}>Add To Wishlist</Button2>
+                  :
+                  <ButtonCancel onClick={handleToggleToWhishlist}>Remove From Wishlist</ButtonCancel>
+                }
+              </>}
           </ButtonWrapper>
         </Right>
       </Container>

@@ -3,8 +3,12 @@ import { CheckboxContainer, CheckboxInput, ClearAll, Container, FilterDiv, Filte
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import { bathroom_facility_list, furnitureFacility_list, residenttype_list, roomPrivacy_list, tenant_list } from './filterList';
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { addAllRooms } from '../../redux/slices/roomSlice';
 
-function Filters({filteredRooms, setFilteredRooms}) {
+function Filters() {
+  const dispatch = useDispatch();
+  const {filteredRooms} = useSelector(state=>state.room);
   const [residentType, setResidentType] = useState(null);
   const [tenantType, setTenantType] = useState(null);
   const [maxTenant, setMaxTenant] = useState(null);
@@ -71,7 +75,8 @@ function Filters({filteredRooms, setFilteredRooms}) {
 
         console.log(response)
         console.log(response.data.data)
-        setFilteredRooms(response.data.data)
+        // setFilteredRooms(response.data.data)
+        dispatch(addAllRooms({data:response.data.data}))
 
       } catch (error) {
         console.error('Error fetching filtered mobiles:', error);

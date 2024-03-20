@@ -4,9 +4,16 @@ import Navbar from '../../components/Navbar/Navbar'
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { userContext } from '../../context/userContext';
+import Loader from '../../components/Loader/Loader';
+import { useDispatch } from 'react-redux';
+import { updateRoom } from '../../redux/slices/roomSlice';
+import { useNavigate } from 'react-router-dom';
 
 const NewRoomPage = () => {
     const { isLoggedIn } = useContext(userContext);
+    const [IsLoading , setIsLoading] = useState(false);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [residentType, setResidentType] = useState("Room");
     const [tenantType, setTenantType] = useState("Any");
@@ -15,8 +22,8 @@ const NewRoomPage = () => {
     const [maxTenant, setMaxTenant] = useState(null);
 
     const [floorNumber, setFloorNumber] = useState(null)
-    const [roomPrivacy, setRoomPrivacy] = useState(null);
-    const [bathroomPrivacy, setBathroomPrivacy] = useState(null);
+    const [roomPrivacy, setRoomPrivacy] = useState("Private");
+    const [bathroomPrivacy, setBathroomPrivacy] = useState("Private");
     const [furnitureFacility, setFurnitureFacility] = useState("Not Furnished");
     const [furnitureFacilityValues, setFurnitureFacilityValues] = useState("");
 
@@ -53,6 +60,39 @@ const NewRoomPage = () => {
     const [photos, setPhotos] = useState([]);
 
 
+    const handleResetFields = ()=>{
+        setResidentType("Room");
+        setTenantType("Any");
+        setRoomType(null);
+        setRent(null);
+        setMaxTenant(null);
+        setFloorNumber(null);
+        setRoomPrivacy("Private");
+        setBathroomPrivacy("Private");
+        setFurnitureFacility("Not Furnished");
+        setFurnitureFacilityValues("");
+        setAddress(initialValue);
+        setWaterFacility({
+            isFee: false,
+            rent: ""
+        });
+        setGasFacility({
+            isFee: false,
+            rent: ""
+        });
+        setInternetFacility({
+            isFee: false,
+            rent: ""
+        });
+        setAccessbility({
+            parking: false,
+            lift: false,
+            wheelramp: false,
+            petallowed: false
+        });
+        setPhotos([]);
+
+    }
 
 
 
@@ -87,7 +127,7 @@ const NewRoomPage = () => {
             photos.forEach((photo) => {
                 roomData.append("images", photo);
             });
-
+            setIsLoading(true)
             const response = await axios.post(`http://localhost:5000/api/room/add-room/${isLoggedIn._id}`, roomData
                 , {
                     headers: {
@@ -95,9 +135,16 @@ const NewRoomPage = () => {
                     }
                 }
             );
+            if(response.status === 201){
+                toast.success("Room Added Successfully");
+                dispatch(updateRoom({data:response.data.data}));
+                navigate("/")
+            }
             console.log(response);
         } catch (error) {
             console.log(error);
+        }finally{
+            setIsLoading(false)
         }
     }
 
@@ -147,7 +194,9 @@ const NewRoomPage = () => {
             <Navbar />
             <Container>
                 <Wrapper>
-                    <Form onSubmit={handelFormSubmit}
+                    {IsLoading?<Loader text={"Saving Room Details"}/>:
+                        
+                        <Form onSubmit={handelFormSubmit}
                         enctype="multipart/form-data"
                     >
                         {/* resident and tenant type */}
@@ -220,15 +269,15 @@ const NewRoomPage = () => {
                             <InputWrapper>
                                 <InputContainer>
                                     <Label>Private</Label>
-                                    <InputFile type='radio' value="Private" name="roomPrivacy" onChange={(e) => setRoomPrivacy(e.target.value)} />
+                                    <InputFile type='radio' checked={roomPrivacy==="Private"} value="Private" name="roomPrivacy" onChange={(e) => setRoomPrivacy(e.target.value)} />
                                 </InputContainer>
                                 <InputContainer>
                                     <Label>Shared</Label>
-                                    <InputFile type='radio' value="Shared" name="roomPrivacy" onChange={(e) => setRoomPrivacy(e.target.value)} />
+                                    <InputFile type='radio'  checked={roomPrivacy==="Shared"} value="Shared" name="roomPrivacy" onChange={(e) => setRoomPrivacy(e.target.value)} />
                                 </InputContainer>
                                 <InputContainer>
                                     <Label>Apartment/Flat</Label>
-                                    <InputFile type='radio' value="Flat" name="roomPrivacy" onChange={(e) => setRoomPrivacy(e.target.value)} />
+                                    <InputFile type='radio' checked={roomPrivacy==="Flat"} value="Flat" name="roomPrivacy" onChange={(e) => setRoomPrivacy(e.target.value)} />
                                 </InputContainer>
                             </InputWrapper>
                         </MainContainer>
@@ -239,11 +288,11 @@ const NewRoomPage = () => {
                             <InputWrapper>
                                 <InputContainer>
                                     <Label>Private</Label>
-                                    <InputFile type='radio' value="Private" name="bathroomPrivacy" onChange={(e) => setBathroomPrivacy(e.target.value)} />
+                                    <InputFile type='radio' checked={bathroomPrivacy==="Private"} value="Private" name="bathroomPrivacy" onChange={(e) => setBathroomPrivacy(e.target.value)} />
                                 </InputContainer>
                                 <InputContainer>
                                     <Label>Common</Label>
-                                    <InputFile type='radio' value="Common" name="bathroomPrivacy" onChange={(e) => setBathroomPrivacy(e.target.value)} />
+                                    <InputFile type='radio' value="Common" checked={bathroomPrivacy==="Common"} name="bathroomPrivacy" onChange={(e) => setBathroomPrivacy(e.target.value)} />
                                 </InputContainer>
                             </InputWrapper>
                         </MainContainer>
@@ -258,7 +307,7 @@ const NewRoomPage = () => {
                                 </InputContainer>
                                 <InputContainer>
                                     <Label>Semi Furnished</Label>
-                                    <InputFile type='radio' value="Semi Furnished" checked={furnitureFacility === "Semi Furnished"} name="furnitureFacility" onChange={(e) => setFurnitureFacility(e.target.value)} />
+                                    <InputFile  type='radio' value="Semi Furnished" checked={furnitureFacility === "Semi Furnished"} name="furnitureFacility" onChange={(e) => setFurnitureFacility(e.target.value)} />
                                 </InputContainer>
                                 <InputContainer>
                                     <Label>Full Furnished</Label>
@@ -271,7 +320,7 @@ const NewRoomPage = () => {
                             <MainContainer>
                                 <InputContainer >
                                     <Label>Define Furniture Facilities</Label>
-                                    <InputText type='text' required
+                                    <InputText type='text' required={furnitureFacility==="Semi Furnished" || "Full Furnished"}
                                         onChange={(e) => setFurnitureFacilityValues(e.target.value)} placeholder='eg: bed, desk, chair' />
                                 </InputContainer>
                             </MainContainer>
@@ -377,19 +426,19 @@ const NewRoomPage = () => {
                         <MainContainer>Address</MainContainer>
                         <AddressForm >
                             <InputGroup>
-                                <Input name='name' onChange={handleOnChange} type='text' placeholder='name' value={address.name} />
-                                <Input name='contact' onChange={handleOnChange} type='number' placeholder='contact' value={address.contact} />
+                                <Input required name='name' onChange={handleOnChange} type='text' placeholder='name' value={address.name} />
+                                <Input required name='contact' onChange={handleOnChange} type='number' placeholder='contact' value={address.contact} />
                             </InputGroup>
                             <InputGroup>
-                                <Input name='city' onChange={handleOnChange} type='text' placeholder='city' value={address.city} />
-                                <Input name='district' onChange={handleOnChange} type='text' placeholder='district' value={address.district} />
+                                <Input required name='city' onChange={handleOnChange} type='text' placeholder='city' value={address.city} />
+                                <Input required name='district' onChange={handleOnChange} type='text' placeholder='district' value={address.district} />
                             </InputGroup>
                             <InputGroup>
-                                <Input name='area' onChange={handleOnChange} type='text' placeholder='area' value={address.area} />
-                                <Input name='state' onChange={handleOnChange} type='text' placeholder='state' value={address.state} />
+                                <Input required name='area' onChange={handleOnChange} type='text' placeholder='area' value={address.area} />
+                                <Input required name='state' onChange={handleOnChange} type='text' placeholder='state' value={address.state} />
                             </InputGroup>
                             <InputGroup>
-                                <Input name='pincode' onChange={handleOnChange} type='text' placeholder='pincode' value={address.pincode} />
+                                <Input required name='pincode' onChange={handleOnChange} type='text' placeholder='pincode' value={address.pincode} />
                             </InputGroup>
                         </AddressForm>
 
@@ -397,7 +446,7 @@ const NewRoomPage = () => {
                         <MainContainer>
                             <InputContainer>
                                 <BigLabel>Room Photos</BigLabel>
-                                <InputFile type='file' name="images" accept="image/*" multiple onChange={handlePhotoChange} />
+                                <InputFile required type='file' name="images" accept="image/*" multiple onChange={handlePhotoChange} />
                             </InputContainer>
                         </MainContainer>
                         <ImageWrapper>
@@ -413,7 +462,7 @@ const NewRoomPage = () => {
                         </AddRoomButton>
 
 
-                    </Form>
+                    </Form>}
                 </Wrapper>
             </Container>
         </>

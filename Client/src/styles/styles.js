@@ -13,7 +13,7 @@ export const Form = styled.form`${tw`
   flex
   flex-col
   gap-5
-  bg-[#FFDE59]
+  bg-white
   p-8
   rounded
   w-full
@@ -29,7 +29,7 @@ export const Heading = styled.h1`${tw`
 
 export const Input = styled.input`${tw`
   p-2
-  border-2
+ border py-3
   rounded
   outline-none
 `}`;
@@ -42,11 +42,12 @@ export const FeedbackValidation = styled.span`${tw`
 `}`;
 
 export const Button = styled.button`${tw`
-  p-2
+  p-2 text-xl
   bg-[#FF5757]
   rounded
   mt-5
-  w-1/2
+  w-1/2 
+  border-none
   self-center
   font-bold
   cursor-pointer

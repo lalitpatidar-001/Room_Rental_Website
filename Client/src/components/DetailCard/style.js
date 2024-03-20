@@ -146,10 +146,40 @@ flex text-center
 justify-center
 gap-1
 `}`;
+export const ButtonCancel = styled.div`${tw`
+py-2 
+uppercase
+bg-red-500
+border-none
+text-white
+rounded
+text-xl
+font-semibold
+cursor-pointer
+shadow-md
+flex text-center
+justify-center
+gap-1
+`}`;
 export const Button2 = styled.div`${tw`
 py-2 
 uppercase
 bg-orange-500
+border-none
+text-white
+rounded
+text-xl
+font-semibold
+cursor-pointer
+shadow-md
+flex text-center
+justify-center
+gap-1
+`}`;
+export const LoadingButton = styled.div`${tw`
+py-2 
+uppercase
+bg-yellow-500
 border-none
 text-white
 rounded

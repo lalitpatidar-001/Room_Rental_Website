@@ -5,6 +5,8 @@ import axios from "axios"
 import { Link, useNavigate } from 'react-router-dom';
 import ServerError from '../Login/ServerError';
 import FeedBack from '../Login/FeedBack';
+import {toast} from "react-hot-toast"
+import Loader from '../../components/Loader/Loader';
 
 const initialState = {
   username: '',
@@ -50,27 +52,22 @@ function Registratoin() {
       console.log(response)
 
       if(response.status === 201 && data.msg === "User registered successfully" ){
-        alert("User registered successfully");
+        toast.success("LoaggedIn Successfully")
         navigate("/login");
       }
-
-
     } catch (error) {
       console.error('Error during authentication:', error);
-      const status = error.response.status;
-      const response = error.response;
-      const msg =  error.response.data.msg;
-
-      if(status === 409 && msg === "email already exits" ){
-        setFeedback(msg)
+     
+      if(error.response.status === 409 && error.response.data.msg === "email already exits" ){
+        setFeedback(error.response.data.msg)
       }
-      else if(status === 500 && msg === "something went wrong on server"){
-        setFeedback(msg);
+      else if(error.response.status === 500 && error.response.data.msg === "something went wrong on server"){
+        setFeedback(error.response.data.msg);
       }else{
-        setFeedback("something went wrong")
+        toast.error("something went wrong")
       }
 
-      if(response.data.errors?.length >0  && status === 400 ){
+      if(error.response.data.errors?.length >0  && error.response.status === 400 ){
         setErrorMessages(error.response.data.errors.map((error) => error.msg));
        }
 
@@ -80,7 +77,7 @@ function Registratoin() {
     }
   };
 
-
+if(isLoading) return <Loader text="Loading..."/>
 
   return (
     <Container>
@@ -118,7 +115,7 @@ function Registratoin() {
           required></Input>
         <FeedbackValidation>{formErrors.confirmPassword}</FeedbackValidation>
 
-        <Button disabled={isLoading?true : false} type='submit'>{isLoading ? 'Loading' : 'Sign Up'}</Button>
+        <Button disabled={isLoading?true : false} style={{backgroundColor:isLoading?"gray":""}} type='submit'>{isLoading ? 'Loading...' : 'Sign Up'}</Button>
         <span>Already user? <Link to="/">Login here</Link></span>
       </Form>
     </Container>

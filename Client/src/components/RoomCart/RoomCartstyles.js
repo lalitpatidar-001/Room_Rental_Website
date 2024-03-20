@@ -4,16 +4,14 @@ import tw from 'twin.macro';
 export const Container = styled.div`${tw`
  flex
  w-full
- relative
+ relative 
 `}`;
 export const Wrapper = styled.div`${tw`
  md:flex
- w-full
  mt-[1px]
  bg-[#ffffff]
  shadow-lg
  cursor-pointer
-
 `}`;
 
 export const Left = styled.div`${tw`
@@ -21,9 +19,6 @@ export const Left = styled.div`${tw`
  flex
  justify-center
  items-center
- 
-
-
 `}`;
 export const Image = styled.img`
 ${tw`
@@ -151,6 +146,8 @@ flex items-center justify-center
 
 
 `}`;
+
+
 export const DeleteButton = styled.div`${tw`
 absolute top-1 right-2 z-30 
 cursor-pointer
@@ -159,6 +156,14 @@ w-fit p-1
 font-bold text-white 
 flex items-center justify-center
 
+
+`}`;
+
+export const NoImageDiv = styled.div`${tw`
+
+max-w-full
+overflow-hidden
+h-[85%]
 
 `}`;
 

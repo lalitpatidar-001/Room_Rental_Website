@@ -120,7 +120,7 @@ const removeRoom = async (req, res) => {
         const room = await Room.findById(roomId);
         if (!room) return res.status(404).json({ message: "room not found" })
         const deletedRoom = await Room.findByIdAndDelete(roomId);
-        const updateUser = await User.findByIdAndUpdate(room.userId,{ $pull: { visitors: { roomId } }},{new:true}
+        const updateUser = await User.findByIdAndUpdate(room.userId, { $pull: { visitors: { roomId } } }, { new: true }
         );
         console.log("updateUser", updateUser.visitors)
 
@@ -148,7 +148,10 @@ const bookRoom = async (req, res) => {
     // TODO verify roomid 
 
     try {
-        const updatedUser = await User.findByIdAndUpdate(userId, { $push: { bookedRooms: roomId } }, { new: true });
+        const updatedUser = await User.findByIdAndUpdate(userId, { $push: { bookedRooms: roomId } }, { new: true }).select("bookedRooms").populate("bookedRooms");
+
+        const pushedRoomData = updatedUser.bookedRooms[updatedUser.bookedRooms.length - 1];
+        console.log("Pushed Room ID:", pushedRoomData);
 
         const room = await Room.findById(roomId);
         if (!room) {
@@ -160,7 +163,9 @@ const bookRoom = async (req, res) => {
         }
         const updatedRoomOwner = await User.findByIdAndUpdate(room.userId, { $push: { visitors: newVisitor } }, { new: true });
 
-        return res.status(200).json({ message: "room booked succesfully", data: updatedUser, updateOwner: updatedRoomOwner });
+
+
+        return res.status(200).json({ message: "room booked succesfully", data: pushedRoomData});
 
     } catch (error) {
         console.log(error);

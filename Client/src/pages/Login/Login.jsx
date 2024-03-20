@@ -5,8 +5,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { userContext } from '../../context/userContext';
 import ServerError from './ServerError'
 import FeedBack from './FeedBack';
+import Loader from '../../components/Loader/Loader';
 function Login() {
     const {isLoggedIn, setIsLoggedIn} = useContext(userContext);
+    const [isLoading , setIsLoading]  = useState(false)
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: "",
@@ -26,6 +28,7 @@ function Login() {
         setErrorMessages([]);
         setFeedback("") // Clear previous error messages
         try {
+            setIsLoading(true)
             const response = await axios.post("http://localhost:5000/api/auth/login",formData);
             const data = response.data;
             const {_id , email} = data;
@@ -37,26 +40,28 @@ function Login() {
             }
         
         } catch (error) {
-            const status = error.response.status;
-            const response = error.response;
-            const msg =  response.data.msg
+            // const status = error.response.status;
+            // const response = error.response;
+            // const msg =  response.data.msg
 
-            if(status === 404 && msg === "wrong email"){
-                setFeedback(msg)
+            if(error.response.status === 404 && error.response.data.msg === "wrong email"){
+                setFeedback(error.response.data.msg)
             }
-            else if(status === 401 && msg === "wrong credentials"){
-                setFeedback(msg)
+            else if(error.response.status === 401 && error.response.data.msg === "wrong credentials"){
+                setFeedback(error.response.data.msg)
             }else{
                 setFeedback("something went wrong")
             }
             // server error
-            if(response.data.errors?.length >0  && status === 400 ){
+            if(error.response.data.errors?.length >0  && error.response.status === 400 ){
              setErrorMessages(error.response.data.errors.map((error) => error.msg));
             }
+        }finally{
+            setIsLoading(false)
         }
-    };
+    }
 
-
+    if(isLoading) return <Loader text="Loading..."/>
   return (
     <Container>
         <Form onSubmit={handleSubmit}>

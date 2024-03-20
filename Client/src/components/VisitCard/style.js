@@ -2,9 +2,16 @@ import styled from 'styled-components';
 import tw from 'twin.macro';
 
 
+export const Container = styled.div`${tw`
+ md:flex
+ justify-center 
+ mt-[1px]
+ w-full
+ min-h-screen
+`}`;
 export const Wrapper = styled.div`${tw`
  md:flex
- w-full
+ w-[1000px]
  mt-[1px]
  bg-[#ffffff]
  shadow-lg
@@ -66,10 +73,12 @@ export const Middle = styled.div`${tw`
 `}`;
 export const Right = styled.div`${tw`
  flex-1
+ flex
 `}`;
 export const CancelVisitButton = styled.div`${tw`
  p-2 w-fit rounded cursor-pointer
  font-bold text-white bg-red-600
+ self-end mb-4
 `}`;
 
 export const PriceDiv = styled.div`${tw`

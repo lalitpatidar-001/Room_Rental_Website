@@ -11,8 +11,8 @@ const getAllBookedRooms = async (req, res) => {
     const { userId } = req.params;
 
     try {
-        const bookedRooms = await User.findById(userId).select("bookedRoom").populate("bookedRooms");
-        return res.status(200).json({ message: "all booked room retrieved ", data: bookedRooms })
+        const user = await User.findById(userId).select("bookedRoom").populate("bookedRooms");
+        return res.status(200).json({ message: "all booked room retrieved ", data: user.bookedRooms })
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "internal server error" });
@@ -132,6 +132,7 @@ const getWishlist = async(req,res)=>{
         return res.status(500).json({message:"internal server error"});
     }
 }
+
 
 const getUsersRooms = async (req,res)=>{
     const {userId}  = req.params;

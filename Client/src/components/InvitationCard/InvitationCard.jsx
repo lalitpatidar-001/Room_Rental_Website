@@ -7,10 +7,10 @@ const InvitationCard = ({ invitation }) => {
     return (
         <Wrapper>
             <DetailsWrapper>
-                <InviteText>You are invited to visit {invitation.room.roomType} {invitation.room.residentType} by {invitation.user.username}</InviteText>
-                <Address>Address : {invitation.room.address.area}, {invitation.room.address.city}, {invitation.room.address.district}, {invitation.room.address.state} - {invitation.room.address.pincode}</Address>
+                <InviteText>You are invited to visit {invitation?.room?.roomType} {invitation?.room?.residentType} by {invitation.user.username}</InviteText>
+                <Address>Address : {invitation?.room?.address?.area}, {invitation?.room?.address?.city}, {invitation?.room?.address?.district}, {invitation?.room?.address?.state} - {invitation?.room?.address?.pincode}</Address>
             </DetailsWrapper>
-            <Link to={`/room/${invitation.room._id}`}>
+            <Link to={`/room/${invitation?.room?._id}`}>
                 <RoomInfoButton>View Room Details</RoomInfoButton>
             </Link>
         </Wrapper>

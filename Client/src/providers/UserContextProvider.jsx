@@ -5,7 +5,9 @@ function UserContextProvider({children}) {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     // Use a function to initialize user from localStorage
     const storedUser = localStorage.getItem('local-user');
+    if(storedUser){
     return storedUser ? JSON.parse(storedUser) : false;
+  }
   });
   
   useEffect(() => {

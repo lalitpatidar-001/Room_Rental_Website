@@ -1,4 +1,5 @@
 const Invitation = require("../models/Invitation");
+const User = require("../models/User");
 
 const sentInvitation = async(req,res)=>{
     const {userId,roomId,guestId} = req.params;
@@ -11,6 +12,9 @@ const sentInvitation = async(req,res)=>{
         });
 
         const savedInvitation = await newInvitaion.save();
+        const updatedGuest = await User.findByIdAndUpdate(guestId,{$pull:{bookedRooms:roomId}});
+        
+        const updatedInviter = await User.findByIdAndUpdate(userId,{$pull:{visitors:{visitorId: guestId}}})
         return res.status(201).json({message:"invitaion sent successfully"});
     }catch(error){
         console.log(error);

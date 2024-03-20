@@ -1,30 +1,29 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { AddToCartButton, Container, Discount, DiscountDiv, DiscountOff, Feature, Features, GoToCartButton, Heading, Image, Left, Middle, ModelandRating, OriginalPrice, Price, PriceDiv, Address, Right, Wrapper, CancelCross, DeleteButton } from './RoomCartstyles'
+import { AddToCartButton, Container, Discount, DiscountDiv, DiscountOff, Feature, Features, GoToCartButton, Heading, Image, Left, Middle, ModelandRating, OriginalPrice, Price, PriceDiv, Address, Right, Wrapper, CancelCross, DeleteButton, NoImageDiv } from './RoomCartstyles'
 import GradeOutlinedIcon from '@mui/icons-material/GradeOutlined';
 import CurrencyRupeeOutlinedIcon from '@mui/icons-material/CurrencyRupeeOutlined';
 import { Link } from 'react-router-dom';
-import photo from './phone.png'
 import { userContext } from '../../context/userContext';
 import axios from 'axios'
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteMyRoom, deleteRoom } from '../../redux/slices/roomSlice';
+import { deleteWishlist } from '../../redux/slices/wishlistSlice';
 
 function RoomCart({ room, page }) {
   const { isLoggedIn } = useContext(userContext);
-
-  // const { isItemAdded ,setIsItemAdded } = useContext(cartUpdateContext);
-  // const [isInCart, setIsInCart] = useState(false);
-  // const [added , setAdded] = useState(false);
-  // console.log(isLoggedIn ," in room")
+  const dispatch = useDispatch();
+  
 
   const convertInNumber = (numberString) => {
     return parseInt(numberString, 10).toLocaleString('en-IN');
   }
 
-  const fullPath = "http://localhost:5000/image/" + room.images[0]
+  const fullPath = "http://localhost:5000/image/" + room?.images[0]
   console.log("imagePath", fullPath)
 
-  const discount = Math.round((1 - (room.price / room.actualPrice)) * 100);
+  // const discount = Math.round((1 - (room.price / room.actualPrice)) * 100);
   const displayInch = (room.display * 0.393701).toFixed(2);
 
   const handleAddToCartClick = (event, roomId) => {
@@ -84,7 +83,9 @@ function RoomCart({ room, page }) {
     try {
       const response = await axios.put(`http://localhost:5000/api/user/remove-from-wishlist/${room._id}/${isLoggedIn._id}`);
       if (response.status === 200) {
-        toast.success("Room removed from wishlist")
+        toast.success("Room removed from wishlist");
+        dispatch(deleteWishlist({data:room._id}))
+       
       }
     } catch (error) {
       console.log(error)
@@ -97,7 +98,9 @@ function RoomCart({ room, page }) {
       const response = await axios.delete(`http://localhost:5000/api/room/remove-room/${room._id}`);
       console.log(response.data.data);
       if (response.status === 200) {
-        toast.success("Room deleted successfully")
+        dispatch(deleteRoom({data:room._id}));
+        dispatch(deleteMyRoom({data:room._id}))
+        toast.success("Room deleted successfully");
       }
     } catch (error) {
       console.log(error)
@@ -106,29 +109,30 @@ function RoomCart({ room, page }) {
 
   return (
     <Container>
-      <Link to={`/room/${room._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to={`/room/${room?._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
         <Wrapper>
           <Left>
-            <Image src={fullPath} />
+           { !room?.images[0] ? <NoImageDiv />:
+            <Image src={fullPath} />}
           </Left>
           <Middle>
             <ModelandRating>
-              <Heading>{room.roomType} {room.residentType} for {room.tenantType}</Heading>
+              <Heading>{room?.roomType} {room?.residentType} for {room?.tenantType}</Heading>
               <Address>
-                <LocationOnIcon style={{ fontSize: 18, marginBottom: 3 }} /> Vilaspur, Madhya-Pradesh
+                <LocationOnIcon style={{ fontSize: 18, marginBottom: 3 }} /> {room?.address?.city}, {room?.address?.state}
               </Address>
             </ModelandRating>
             <Features>
-              <Feature>{room.roomType} {room.residentType}</Feature>
-              <Feature>only for {room.tenantType}</Feature>
+              <Feature>{room?.roomType} {room?.residentType}</Feature>
+              <Feature>only for {room?.tenantType}</Feature>
               <Feature>On {floor} Floor</Feature>
-              <Feature>Available with {room.bathroomPrivacy} bathroom</Feature>
-              <Feature>{room.furnitureFacility} Room</Feature>
+              <Feature>Available with {room?.bathroomPrivacy} bathroom</Feature>
+              <Feature>{room?.furnitureFacility} Room</Feature>
             </Features>
           </Middle>
           <Right>
             <PriceDiv>
-              <Price><CurrencyRupeeOutlinedIcon style={{ fontSize: 22 }} />{convertInNumber(room.rent)}</Price>
+              <Price><CurrencyRupeeOutlinedIcon style={{ fontSize: 22 }} />{convertInNumber(room?.rent)}</Price>
             </PriceDiv>
 
             <div></div>

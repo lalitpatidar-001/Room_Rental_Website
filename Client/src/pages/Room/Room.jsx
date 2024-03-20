@@ -6,9 +6,11 @@ import Navbar from '../../components/Navbar/Navbar';
 import axios from 'axios';
 import { useLocation, useParams } from 'react-router-dom';
 import { Divider } from '@mui/material';
+import Loader from '../../components/Loader/Loader';
 
 const Room = () => {
   const {id} = useParams();
+  
 
   const [room , setRoom] = useState(null);
   const [loading , setLoading] = useState(false);
@@ -39,12 +41,12 @@ const Room = () => {
     <>
     <Navbar/>{
       loading?
-      <div>Loading</div>
+     <Loader text="Loading Room Details"/>
       :
     <Container>
             <ImageCard images={room?.images}/>
            <InfoContainer >
-           <DetailCard room={room} />
+           <DetailCard room={room}  />
            </InfoContainer>
     </Container>}
     </>

@@ -4,6 +4,7 @@ import tw from 'twin.macro';
 export const Container = styled.div`${tw`
 w-10
 h-10
+flex items-center
 overflow-hidden
 cursor-pointer
  

@@ -1,11 +1,11 @@
 import React from 'react'
 import { Container, Message } from './noResultStyles'
 
-function NoResult() {
+function NoResult({text}) {
   return (
     
     <Container>
-        <Message>No Result Matched to Filter</Message>
+        <Message>{text?text:"No Result"}</Message>
     </Container>
   )
 }

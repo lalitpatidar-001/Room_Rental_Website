@@ -4,10 +4,13 @@ import { Link } from 'react-router-dom'
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { userContext } from '../../context/userContext';
+import { useDispatch } from 'react-redux';
+import { deleteVisitor } from '../../redux/slices/visitorsSlice';
 
 const VisitorsCard = ({visitor}) => {
     console.log("visitors",visitor);
     const { isLoggedIn } = useContext(userContext);
+    const dispatch = useDispatch();
 
     const handleCancelClick = async()=>{
         try{
@@ -17,6 +20,7 @@ const VisitorsCard = ({visitor}) => {
 
             if(response.status === 200){
                 toast.success("Visit Canceled Successfully");
+                dispatch(deleteVisitor({data:visitor._id}))
             }
         }catch(error){
             console.log(error);
@@ -31,6 +35,7 @@ const VisitorsCard = ({visitor}) => {
 
             if(response.status === 201){
                 toast.success(response.data.message);
+                dispatch(deleteVisitor({data:visitor._id}))
             }
         }catch(error){
             console.log(error);

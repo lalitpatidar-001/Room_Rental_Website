@@ -1,9 +1,10 @@
 import React from 'react'
 import { Container } from './style'
 import VisitorCard from '../VisitCard/VisitCard'
+import NoResult from '../utils/NoResultMatched/NoResult'
 
 
-function RoomVistorsCard({roomVisits,}) {
+function RoomVistorsCard({ roomVisits }) {
 
 
   // if(mobiles.length <= 0 ){
@@ -13,10 +14,18 @@ function RoomVistorsCard({roomVisits,}) {
   // }
   return (
     <Container>
-    {roomVisits.map((visit)=>{
-      return <VisitorCard
-      visit={visit}/>
-    })}
+
+      {
+        roomVisits?.length <= 0 ?
+        <NoResult  text="No Visits Yet!"/>
+      : <>
+            {roomVisits.map((visit) => {
+              return <VisitorCard
+                visit={visit} />
+            })}
+          </>
+      }
+
     </Container>
   )
 }
